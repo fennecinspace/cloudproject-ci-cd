@@ -21,13 +21,17 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         
+    - 
+      id: commit
+      uses: pr-mpt/actions-commit-hash@v2
+        
     -
       name: Build and Push to Docker hub
       uses: docker/build-push-action@v3
       with:
         context: .
         platforms: linux/amd64,linux/arm64
-        tags: ${{ secrets.DOCKER_USERNAME }}/app:${{ steps.commit.outputs.tag }}
+        tags: ${{ secrets.DOCKER_USERNAME }}/app:${{ steps.commit.outputs.short }}
         push: true
         secrets: |
           "github_token=${{ secrets.GITHUB_TOKEN }}"
