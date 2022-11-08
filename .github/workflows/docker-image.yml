@@ -11,12 +11,13 @@ env:
   password: ${{ secrets.DOCKER_PASSWORD }}
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
     steps:
+    -
+        name: Checkout
+        uses: actions/checkout@v3
+        
     - 
       name: Login to Docker Hub
       uses: docker/login-action@v2
@@ -25,8 +26,12 @@ jobs:
         password: ${{ env.password }}
         
     -
-      name: Build and push the Docker image
-      run: 
-        docker build . --file Dockerfile --tag "$username/cloudproject-ci-cd:${{github.head_ref}}"
-        docker run "$username/cloudproject-ci-cd:${{github.head_ref}}"
-        docker push "$username/cloudproject-ci-cd:${{github.head_ref}}"
+      name: Build and Push to Docker hub
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        tags: "${{ env.username }}/app:${{ steps.commit.outputs.tag }}"
+        push: true
+        secrets: |
+          "github_token=${{ secrets.GITHUB_TOKEN }}"
