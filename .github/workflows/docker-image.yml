@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  username: ${{ secrets.DOCKER_USERNAME }}
+  password: ${{ secrets.DOCKER_PASSWORD }}
+
 jobs:
 
   build:
@@ -14,18 +18,14 @@ jobs:
 
     steps:
     - 
-      uses: docker/login-action@v2
       name: Login to Docker Hub
+      uses: docker/login-action@v2
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        username: ${{ env.username }}
+        password: ${{ env.password }}
         
-    - uses: actions/checkout@v2 # Checking out the repo
-    
     -
       name: Build and push the Docker image
-      env:
-        username: ${{ secrets.DOCKER_USERNAME }}
       run: 
         docker build . --file Dockerfile --tag "$username/cloudproject-ci-cd:${{github.head_ref}}"
         docker run "$username/cloudproject-ci-cd:${{github.head_ref}}"
