@@ -25,12 +25,30 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         
+    - 
+      name: Automated Version Bump
+      uses: 'phips28/gh-action-bump-version@master'
+      id: version-bump
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        default: fix
+        tag-prefix: 'v'
+        
+    - 
+      name: Output Step
+      env:
+        NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
+      run: echo "new tag $NEW_TAG"
+        
     -
         name: Build and push image
         uses: docker/build-push-action@v3
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          push: true
+          tags: $DOCKER_USERNAME/cloudproject-ci-cd:${{ steps.version-bump.outputs.newTag }}
           labels: ${{ steps.meta.outputs.labels }}
+          secrets: |
+            "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}"
       
