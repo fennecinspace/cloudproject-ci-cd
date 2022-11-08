@@ -26,4 +26,5 @@ jobs:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       run: 
         docker build . --file Dockerfile --tag "$DOCKER_USERNAME"/cloudproject-ci-cd:${{github.head_ref}}
+        docker run "$DOCKER_USERNAME"/cloudproject-ci-cd:${{github.head_ref}}
         docker push "$DOCKER_USERNAME"/cloudproject-ci-cd:${{github.head_ref}}
